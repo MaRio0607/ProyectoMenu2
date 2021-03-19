@@ -11,5 +11,10 @@ public class Nave extends Objeto {
         super(texture, x, y);// el constructor de la super clase
     }
 
+    //metodo para mover el sprite
+    public  void  mover(float dx){
+        sprite.setX(sprite.getX()+dx);
+    }
+
 
 }
