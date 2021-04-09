@@ -1,12 +1,17 @@
 package mx.mcd.demodvd;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
-import com.sun.org.apache.xalan.internal.xsltc.dom.AnyNodeCounter;
+
+import mx.mcd.demodvd.spaceInvaders.Alien;
+import mx.mcd.demodvd.spaceInvaders.Bala;
+import mx.mcd.demodvd.spaceInvaders.EstadoAlien;
+import mx.mcd.demodvd.spaceInvaders.Nave;
+import mx.mcd.demodvd.utilerias.Texto;
 
 public class PantallaSpaceInvaders extends Pantalla {
 
@@ -15,24 +20,32 @@ public class PantallaSpaceInvaders extends Pantalla {
 
     //Enemigos
     //private Alien alien; //borrar
-    private Array<Alien> arrAliens; //Guarda TODOS los aliens
+    private Array<mx.mcd.demodvd.spaceInvaders.Alien> arrAliens; //Guarda TODOS los aliens
     private float timerMover = 0; //Contar tiempo para que los aliens den pasos
     private final float LIMITE_PASOS_ALIENS = 0.5f; //Cada segundo los aliens darán un paso
     private float DX_PASO_ALIEN = 10; // +, derecha    -, izquierda
     private int contadorPasos = 10;
 
     //Personaje (Nave)
-    private Nave nave;
+    private mx.mcd.demodvd.spaceInvaders.Nave nave;
 
     //Indican si se mueve en cierta dirección
     private boolean moviendoIzquierda = false;
     private boolean moviendoDerecha = false;
 
     //Proyectil (Disparo de la nave)
-    private Bala bala;
+    private mx.mcd.demodvd.spaceInvaders.Bala bala;
     private Texture texturaBala;
     //Boton de disparo
     private Texture texturaDisparo;
+
+    //Marcador (vidas, niveles, etc)
+    private int puntos=0;
+    private Texto texto;    //escribe texto en la pantalla
+
+    //regresa al menu principal
+    private Texture textureBack;
+
 
     public PantallaSpaceInvaders(Juego juego) {
         this.juego = juego;
@@ -45,8 +58,24 @@ public class PantallaSpaceInvaders extends Pantalla {
         crearNave();
         crearBotonDisparo();
         crearTexturaBala();
+        crearTexto();
+        crearBack();
+        recuperarMarcador();
         //Ahora la misma pantalla RECIBE Y PROCESA los eventos
         Gdx.input.setInputProcessor(new ProcesadorEntrada());
+    }
+
+    private void recuperarMarcador() {
+        Preferences prefs= Gdx.app.getPreferences("PUNTAJE");
+        puntos=prefs.getInteger("puntos",0);
+    }
+
+    private void crearBack() {
+        textureBack=new Texture("Space/back.png");
+    }
+
+    private void crearTexto() {
+        texto= new Texto("Fonts/space.fnt");
     }
 
     private void crearTexturaBala() {
@@ -70,7 +99,7 @@ public class PantallaSpaceInvaders extends Pantalla {
         arrAliens = new Array<>(11*5);
         for(int renglon = 0; renglon < 5; renglon++){ //Recorrer los renglones (0 - 4)
             for (int columna = 0; columna < 11; columna++){
-                Alien alien = new Alien(texturaArriba, textureAlienAbajo, textureExplota, 310 + columna*60,ALTO/2 + renglon*60);
+                mx.mcd.demodvd.spaceInvaders.Alien alien = new mx.mcd.demodvd.spaceInvaders.Alien(texturaArriba, textureAlienAbajo, textureExplota, 310 + columna*60,ALTO/2 + renglon*60);
                 arrAliens.add(alien); //Lo guarda en el arrelo
             }
         }
@@ -88,7 +117,7 @@ public class PantallaSpaceInvaders extends Pantalla {
         batch.setProjectionMatrix(camara.combined);
 
         batch.begin();
-        for (Alien alien: arrAliens) //Visita cada objeto del arreglo
+        for (mx.mcd.demodvd.spaceInvaders.Alien alien: arrAliens) //Visita cada objeto del arreglo
         {
             alien.render(batch);
         }
@@ -102,6 +131,13 @@ public class PantallaSpaceInvaders extends Pantalla {
 
         //Dibujar boton disparo
         batch.draw(texturaDisparo,ANCHO-texturaDisparo.getWidth()*2,texturaDisparo.getHeight()/2);
+
+
+        //dibujar marcador
+        texto.mostrarMensaje(batch,Integer.toString(puntos),.95f*ANCHO,0.9f*ALTO);
+        //dibujar back
+        batch.draw(textureBack,textureBack.getWidth()/2,ALTO-3*textureBack.getHeight()/2);
+
         batch.end();
     }
 
@@ -133,8 +169,8 @@ public class PantallaSpaceInvaders extends Pantalla {
 
     private void depurarAliens() {
         for(int i= arrAliens.size-1; i>=0; i--){
-            Alien alien = arrAliens.get(i);
-            if(alien.getEstado() == EstadoAlien.EXPLOTA){
+            mx.mcd.demodvd.spaceInvaders.Alien alien = arrAliens.get(i);
+            if(alien.getEstado() == mx.mcd.demodvd.spaceInvaders.EstadoAlien.EXPLOTA){
                 arrAliens.removeIndex(i);
             }
         }
@@ -144,7 +180,7 @@ public class PantallaSpaceInvaders extends Pantalla {
         timerMover += Gdx.graphics.getDeltaTime();
         if(timerMover >= LIMITE_PASOS_ALIENS){
             timerMover = 0;
-            for (Alien alien: arrAliens
+            for (mx.mcd.demodvd.spaceInvaders.Alien alien: arrAliens
             ) {
                 alien.moverHorizontal(DX_PASO_ALIEN);
                 alien.cambiarEstado();
@@ -169,6 +205,9 @@ public class PantallaSpaceInvaders extends Pantalla {
             if(bala.sprite.getBoundingRectangle().overlaps(alien.sprite.getBoundingRectangle())){
                 //Le pegó
                 alien.setEstado(EstadoAlien.EXPLOTA);
+                //contar puntos
+                puntos+=150;
+                //desaparece la bala
                 bala = null; //No regresar al for
                 break;
             }
@@ -215,7 +254,23 @@ public class PantallaSpaceInvaders extends Pantalla {
             //button = dice si presione el boton izq o derecho
             Vector3 v = new Vector3(screenX,screenY,0);
             camara.unproject(v); //Convierte de coordenadas FISICAS a LÓGICAS
-            //PRIMERO
+
+            float altoBack= textureBack.getHeight();
+            float anchoBack=textureBack.getHeight();
+            float xBack= textureBack.getHeight()/2;
+            float yBack=  ALTO-1.5f*textureBack.getWidth();
+
+            //verificar si se pico al boton de regresar
+            Rectangle rectBack=new Rectangle(xBack,yBack,anchoBack,altoBack);
+            if (rectBack.contains(v.x,v.y)){
+                //guardar marcador
+                Preferences preferences=Gdx.app.getPreferences("PUNTAJE");
+                preferences.putInteger("puntos", puntos);
+                preferences.flush();//Guardar en disco
+                //regresar a pantalla menu
+                juego.setScreen(new PantallaMenu(juego));
+            }else
+            //probar si hace click en el boton de dispara
             if( v.x >= ANCHO-2*texturaDisparo.getWidth() && v.x <= ANCHO - texturaDisparo.getWidth()
                     && v.y >= texturaDisparo.getHeight()/2 && v.y <= 1.5f*texturaDisparo.getHeight()){
                 Gdx.app.log("DISPARO", "Dispara");

@@ -1,6 +1,9 @@
-package mx.mcd.demodvd;
+package mx.mcd.demodvd.spaceInvaders;
 
 import com.badlogic.gdx.graphics.Texture;
+
+import mx.mcd.demodvd.Objeto;
+
 //proyectil
 //Autor:mario
 public class Bala extends Objeto {

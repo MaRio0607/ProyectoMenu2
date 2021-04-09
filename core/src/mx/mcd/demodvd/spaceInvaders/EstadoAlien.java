@@ -1,4 +1,4 @@
-package mx.mcd.demodvd;
+package mx.mcd.demodvd.spaceInvaders;
 
 public enum EstadoAlien {
     ARRIBA,

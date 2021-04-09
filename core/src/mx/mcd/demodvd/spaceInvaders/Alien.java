@@ -1,11 +1,13 @@
-package mx.mcd.demodvd;
+package mx.mcd.demodvd.spaceInvaders;
 
 import com.badlogic.gdx.graphics.Texture;
+
+import mx.mcd.demodvd.Objeto;
 
 /*
 Representa los aliens en la pantalla
  */
-public class Alien extends Objeto{
+public class Alien extends Objeto {
 
     //Animacion
     private Texture texturaArriba;
