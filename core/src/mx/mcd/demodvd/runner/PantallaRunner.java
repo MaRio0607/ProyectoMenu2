@@ -1,8 +1,9 @@
 package mx.mcd.demodvd.runner;
 
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 
 import mx.mcd.demodvd.Juego;
 import mx.mcd.demodvd.Pantalla;
@@ -19,8 +20,12 @@ public class PantallaRunner extends Pantalla {
     private Mario mario;
 
     //enemigo
-    private Goomba goomba;
+    //private Goomba goomba;
+    private Array<Goomba>goombaArray;
     private Texture textureGoomba;
+    private float timerGoomba;
+    private final float TIEMPO_CREAR_GOOMBA=2;
+
     public PantallaRunner(Juego juego) {
         this.juego=juego;
     }
@@ -29,17 +34,18 @@ public class PantallaRunner extends Pantalla {
     public void show() {
         crearFondo();
         crearMario();
-        crearGoomba();
+        crearGoombas();
     }
 
-    private void crearGoomba() {
+    private void crearGoombas() {
         textureGoomba=new Texture("runner/goomba.png");
-        goomba=new Goomba(textureGoomba,ANCHO-62,54);
+        //goomba=new Goomba(textureGoomba,ANCHO-62,64);
+        goombaArray=new Array<>(3);
     }
 
     private void crearMario() {
         textureMario=new Texture("runner/MarioSprites.png");
-        mario=new Mario(textureMario,ANCHO/2,64);
+        mario=new Mario(textureMario,ANCHO/2,54);
     }
 
     private void crearFondo() {
@@ -48,7 +54,7 @@ public class PantallaRunner extends Pantalla {
 
     @Override
     public void render(float delta) {
-        actualizar();
+        actualizar(delta);
         borrarPantalla(0,0,0);
         batch.setProjectionMatrix(camara.combined);
 
@@ -58,13 +64,35 @@ public class PantallaRunner extends Pantalla {
         //Dibujar mario
         mario.render(batch);
         //Dibujar goomba
-        goomba.render(batch);
+        // goomba.render(batch);
+        for (Goomba goomba:goombaArray){
+            goomba.render(batch);
+        }
         batch.end();
 
     }
 
-    private void actualizar() {
+    private void actualizar(float delta) {
         actualizarFondo();
+        actualizarGoombas(delta);
+    }
+
+    private void actualizarGoombas(float delta) {
+        //crear
+        timerGoomba +=delta;
+        if (timerGoomba>=TIEMPO_CREAR_GOOMBA){
+            timerGoomba=0;
+            //crear enemigo
+            float xGoomba= MathUtils.random(ANCHO,ANCHO*1.5f);
+            Goomba goomba=new Goomba(textureGoomba,xGoomba,54);
+            //Gdx.app.log("CREAR GOOMBAS","x="+xGoomba);
+            goombaArray.add(goomba);
+        }
+
+        //mover enemigos
+        for (Goomba goomba:goombaArray){
+            goomba.moverIzquierda(delta);//fisica
+        }
     }
 
     private void actualizarFondo() {
