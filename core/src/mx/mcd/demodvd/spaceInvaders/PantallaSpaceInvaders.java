@@ -1,4 +1,4 @@
-package mx.mcd.demodvd;
+package mx.mcd.demodvd.spaceInvaders;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
@@ -7,6 +7,9 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
+import mx.mcd.demodvd.Juego;
+import mx.mcd.demodvd.Pantalla;
+import mx.mcd.demodvd.PantallaMenu;
 import mx.mcd.demodvd.spaceInvaders.Alien;
 import mx.mcd.demodvd.spaceInvaders.Bala;
 import mx.mcd.demodvd.spaceInvaders.EstadoAlien;
@@ -20,7 +23,7 @@ public class PantallaSpaceInvaders extends Pantalla {
 
     //Enemigos
     //private Alien alien; //borrar
-    private Array<mx.mcd.demodvd.spaceInvaders.Alien> arrAliens; //Guarda TODOS los aliens
+    private Array<Alien> arrAliens; //Guarda TODOS los aliens
     private float timerMover = 0; //Contar tiempo para que los aliens den pasos
     private final float LIMITE_PASOS_ALIENS = 0.5f; //Cada segundo los aliens darán un paso
     private float DX_PASO_ALIEN = 10; // +, derecha    -, izquierda
@@ -99,7 +102,7 @@ public class PantallaSpaceInvaders extends Pantalla {
         arrAliens = new Array<>(11*5);
         for(int renglon = 0; renglon < 5; renglon++){ //Recorrer los renglones (0 - 4)
             for (int columna = 0; columna < 11; columna++){
-                mx.mcd.demodvd.spaceInvaders.Alien alien = new mx.mcd.demodvd.spaceInvaders.Alien(texturaArriba, textureAlienAbajo, textureExplota, 310 + columna*60,ALTO/2 + renglon*60);
+                Alien alien = new Alien(texturaArriba, textureAlienAbajo, textureExplota, 310 + columna*60,ALTO/2 + renglon*60);
                 arrAliens.add(alien); //Lo guarda en el arrelo
             }
         }
@@ -117,7 +120,7 @@ public class PantallaSpaceInvaders extends Pantalla {
         batch.setProjectionMatrix(camara.combined);
 
         batch.begin();
-        for (mx.mcd.demodvd.spaceInvaders.Alien alien: arrAliens) //Visita cada objeto del arreglo
+        for (Alien alien: arrAliens) //Visita cada objeto del arreglo
         {
             alien.render(batch);
         }
@@ -169,8 +172,8 @@ public class PantallaSpaceInvaders extends Pantalla {
 
     private void depurarAliens() {
         for(int i= arrAliens.size-1; i>=0; i--){
-            mx.mcd.demodvd.spaceInvaders.Alien alien = arrAliens.get(i);
-            if(alien.getEstado() == mx.mcd.demodvd.spaceInvaders.EstadoAlien.EXPLOTA){
+            Alien alien = arrAliens.get(i);
+            if(alien.getEstado() == EstadoAlien.EXPLOTA){
                 arrAliens.removeIndex(i);
             }
         }
@@ -180,7 +183,7 @@ public class PantallaSpaceInvaders extends Pantalla {
         timerMover += Gdx.graphics.getDeltaTime();
         if(timerMover >= LIMITE_PASOS_ALIENS){
             timerMover = 0;
-            for (mx.mcd.demodvd.spaceInvaders.Alien alien: arrAliens
+            for (Alien alien: arrAliens
             ) {
                 alien.moverHorizontal(DX_PASO_ALIEN);
                 alien.cambiarEstado();

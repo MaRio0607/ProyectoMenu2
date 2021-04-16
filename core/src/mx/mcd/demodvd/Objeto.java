@@ -9,7 +9,7 @@ Representa objetos en el juego
 Autor: Mario
  */
 public class Objeto {
-    protected Sprite sprite;//imagen posicion
+    public Sprite sprite;//imagen posicion
 
     //constructor, Inicializa el objegto con la imagen y la poscicion
     public Objeto (Texture texture, float x, float y){
