@@ -18,6 +18,9 @@ public class PantallaRunner extends Pantalla {
     //personaje
     private Mario mario;
 
+    //enemigo
+    private Goomba goomba;
+    private Texture textureGoomba;
     public PantallaRunner(Juego juego) {
         this.juego=juego;
     }
@@ -26,11 +29,17 @@ public class PantallaRunner extends Pantalla {
     public void show() {
         crearFondo();
         crearMario();
+        crearGoomba();
+    }
+
+    private void crearGoomba() {
+        textureGoomba=new Texture("runner/goomba.png");
+        goomba=new Goomba(textureGoomba,ANCHO-62,54);
     }
 
     private void crearMario() {
         textureMario=new Texture("runner/MarioSprites.png");
-        mario=new Mario(textureMario,ANCHO/2,100);
+        mario=new Mario(textureMario,ANCHO/2,64);
     }
 
     private void crearFondo() {
@@ -48,6 +57,8 @@ public class PantallaRunner extends Pantalla {
         batch.draw(textureFondo,xFondo+textureFondo.getWidth(),0);
         //Dibujar mario
         mario.render(batch);
+        //Dibujar goomba
+        goomba.render(batch);
         batch.end();
 
     }
