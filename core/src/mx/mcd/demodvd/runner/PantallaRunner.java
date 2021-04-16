@@ -1,7 +1,10 @@
-package mx.mcd.demodvd;
+package mx.mcd.demodvd.runner;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
+
+import mx.mcd.demodvd.Juego;
+import mx.mcd.demodvd.Pantalla;
 
 public class PantallaRunner extends Pantalla {
     private Juego juego;
