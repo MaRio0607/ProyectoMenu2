@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
+import mx.mcd.demodvd.plataformas.PantallaPlataformas;
 import mx.mcd.demodvd.runner.PantallaRunner;
 import mx.mcd.demodvd.spaceInvaders.PantallaSpaceInvaders;
 
@@ -52,7 +53,7 @@ public class PantallaMenu extends Pantalla {
         escenaMenu.addActor(btnMario);
         btnMario.addListener(new ClickListener(){
            public void clicked(InputEvent event, float x, float y){
-               juego.setScreen(new PantallaMario(juego));
+               juego.setScreen(new PantallaPlataformas(juego));
            }
         });
 

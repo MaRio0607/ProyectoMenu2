@@ -1,8 +1,10 @@
 package mx.mcd.demodvd.runner;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
 import mx.mcd.demodvd.Juego;
@@ -26,6 +28,10 @@ public class PantallaRunner extends Pantalla {
     private float timerGoomba;
     private final float TIEMPO_CREAR_GOOMBA=2;
 
+    //Disparo del personaje
+    private Array<BolaFuego>arrBolas;
+    private Texture texturaBola;
+
     public PantallaRunner(Juego juego) {
         this.juego=juego;
     }
@@ -35,6 +41,14 @@ public class PantallaRunner extends Pantalla {
         crearFondo();
         crearMario();
         crearGoombas();
+        crearBolas();
+        //poner input procesor
+        Gdx.input.setInputProcessor(new ProcesadorEntrada());
+    }
+
+    private void crearBolas() {
+        arrBolas=new Array<>();
+        texturaBola=new Texture("runner/bolaFuego.png");
     }
 
     private void crearGoombas() {
@@ -68,13 +82,33 @@ public class PantallaRunner extends Pantalla {
         for (Goomba goomba:goombaArray){
             goomba.render(batch);
         }
+
+        //Dibujar bolas de fuego
+        for (BolaFuego bolaFuego:arrBolas){
+            bolaFuego.render(batch);
+        }
         batch.end();
 
     }
 
+    //se actualizan los objeteos del nivel
     private void actualizar(float delta) {
         actualizarFondo();
         actualizarGoombas(delta);
+        actualizarBolas(delta);
+    }
+//mover todos los proyectiles
+    private void actualizarBolas(float delta) {
+        for (int i=arrBolas.size-1;i>=0;i--){
+            BolaFuego bolaFuego = arrBolas.get(i);
+            bolaFuego.mover(delta);
+            //Prueba si la bola debe desaparecer
+            if(bolaFuego.getX()>ANCHO){
+                //borrar el objeto
+                arrBolas.removeIndex(i);
+            }
+        }
+
     }
 
     private void actualizarGoombas(float delta) {
@@ -115,5 +149,56 @@ public class PantallaRunner extends Pantalla {
     @Override
     public void dispose() {
 
+    }
+
+    private class ProcesadorEntrada implements InputProcessor {
+        @Override
+        public boolean keyDown(int keycode) {
+            return false;
+        }
+
+        @Override
+        public boolean keyUp(int keycode) {
+            return false;
+        }
+
+        @Override
+        public boolean keyTyped(char character) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            Vector3 v =new Vector3(screenX, screenY,0);
+            camara.unproject(v);
+            if (v.x<=ANCHO/2){
+                //Dispara
+                BolaFuego bolaFuego = new BolaFuego(texturaBola,mario.getSprite().getX(),mario.getSprite().getY());
+                arrBolas.add(bolaFuego);
+            }else {
+                mario.saltar();  //Top-Down
+            }
+            return true;
+        }
+
+        @Override
+        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDragged(int screenX, int screenY, int pointer) {
+            return false;
+        }
+
+        @Override
+        public boolean mouseMoved(int screenX, int screenY) {
+            return false;
+        }
+
+        @Override
+        public boolean scrolled(float amountX, float amountY) {
+            return false;
+        }
     }
 }

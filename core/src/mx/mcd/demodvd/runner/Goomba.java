@@ -19,7 +19,7 @@ public class Goomba extends Objeto {
 
     public Goomba(Texture texture,float x, float y){
         TextureRegion region= new TextureRegion(texture);
-        TextureRegion [][] texturas= region.split(31,20);
+        TextureRegion [][] texturas= region.split(31,29);
 
         //Animacion
         TextureRegion[] arrFrames={texturas[0][0], texturas[0][1]};
