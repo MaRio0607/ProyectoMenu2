@@ -15,10 +15,10 @@ public class PantallaRunner extends Pantalla {
 
     //fondo infinito
     private Texture textureFondo;
-    private Texture textureMario;
     private float xFondo=0;
 
     //personaje
+    private Texture textureMario;
     private Mario mario;
 
     //enemigo
