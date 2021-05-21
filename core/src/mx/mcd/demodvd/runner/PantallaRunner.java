@@ -114,6 +114,7 @@ public class PantallaRunner extends Pantalla {
             escenaPausa.draw();
         }
 
+
         //tecla de back
         if (Gdx.input.isKeyPressed(Input.Keys.BACK)){
             //regresar a la pantalla anterior

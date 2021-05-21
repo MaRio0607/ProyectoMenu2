@@ -66,6 +66,11 @@ public class PantallaSpaceInvaders extends Pantalla {
         recuperarMarcador();
         //Ahora la misma pantalla RECIBE Y PROCESA los eventos
         Gdx.input.setInputProcessor(new ProcesadorEntrada());
+
+        //MUSICA
+        juego.reporducir(Juego.TipoMusica.NIVEL1);
+
+
     }
 
     private void recuperarMarcador() {
@@ -271,7 +276,9 @@ public class PantallaSpaceInvaders extends Pantalla {
                 preferences.putInteger("puntos", puntos);
                 preferences.flush();//Guardar en disco
                 //regresar a pantalla menu
+                juego.detener();//detiene la musica
                 juego.setScreen(new PantallaMenu(juego));
+
             }else
             //probar si hace click en el boton de dispara
             if( v.x >= ANCHO-2*texturaDisparo.getWidth() && v.x <= ANCHO - texturaDisparo.getWidth()
