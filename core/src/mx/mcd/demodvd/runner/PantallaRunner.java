@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import mx.mcd.demodvd.Juego;
 import mx.mcd.demodvd.Pantalla;
+import mx.mcd.demodvd.PantallaMenu;
 
 public class PantallaRunner extends Pantalla {
     private Juego juego;
@@ -111,6 +112,12 @@ public class PantallaRunner extends Pantalla {
         //Dibujar la PAUSA
         if(estadoJuego==EstadoJuego.PAUSADO && escenaPausa !=null){
             escenaPausa.draw();
+        }
+
+        //tecla de back
+        if (Gdx.input.isKeyPressed(Input.Keys.BACK)){
+            //regresar a la pantalla anterior
+            juego.setScreen(new PantallaMenu(juego));
         }
 
     }
