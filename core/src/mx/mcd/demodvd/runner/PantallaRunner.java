@@ -1,11 +1,20 @@
 package mx.mcd.demodvd.runner;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import mx.mcd.demodvd.Juego;
 import mx.mcd.demodvd.Pantalla;
@@ -32,6 +41,13 @@ public class PantallaRunner extends Pantalla {
     private Array<BolaFuego>arrBolas;
     private Texture texturaBola;
 
+    //PAUSA
+    private EscenaPausa escenaPausa;
+    private ProcesadorEntrada procesadorEntrada;
+
+    //ESTADOS del Juego
+    private EstadoJuego estadoJuego=EstadoJuego.JUGANDO;
+
     public PantallaRunner(Juego juego) {
         this.juego=juego;
     }
@@ -43,7 +59,11 @@ public class PantallaRunner extends Pantalla {
         crearGoombas();
         crearBolas();
         //poner input procesor
-        Gdx.input.setInputProcessor(new ProcesadorEntrada());
+        procesadorEntrada=new ProcesadorEntrada();
+        Gdx.input.setInputProcessor(procesadorEntrada);
+
+        //Bloquear la pantalla
+        Gdx.input.setCatchKey(Input.Keys.BACK,true);
     }
 
     private void crearBolas() {
@@ -88,14 +108,21 @@ public class PantallaRunner extends Pantalla {
             bolaFuego.render(batch);
         }
         batch.end();
+        //Dibujar la PAUSA
+        if(estadoJuego==EstadoJuego.PAUSADO && escenaPausa !=null){
+            escenaPausa.draw();
+        }
 
     }
 
     //se actualizan los objeteos del nivel
     private void actualizar(float delta) {
-        actualizarFondo();
-        actualizarGoombas(delta);
-        actualizarBolas(delta);
+        if (estadoJuego==EstadoJuego.JUGANDO){
+            actualizarFondo();
+            actualizarGoombas(delta);
+            actualizarBolas(delta);
+        }
+
     }
 //mover todos los proyectiles
     private void actualizarBolas(float delta) {
@@ -176,7 +203,15 @@ public class PantallaRunner extends Pantalla {
                 BolaFuego bolaFuego = new BolaFuego(texturaBola,mario.getSprite().getX(),mario.getSprite().getY());
                 arrBolas.add(bolaFuego);
             }else {
-                mario.saltar();  //Top-Down
+                //SALTO
+               // mario.saltar();  //Top-Down
+                //PAUSA
+                if (escenaPausa==null){//INICIALIZACIN LAZY
+                    escenaPausa=new EscenaPausa(vista);
+                }
+                estadoJuego=EstadoJuego.PAUSADO;
+                //CAMBIAR PROCESADOR
+                Gdx.input.setInputProcessor(escenaPausa);
             }
             return true;
         }
@@ -200,5 +235,37 @@ public class PantallaRunner extends Pantalla {
         public boolean scrolled(float amountX, float amountY) {
             return false;
         }
+    }
+    //La escena que se muestra cuandi el jugador pausa el juego
+    private class EscenaPausa extends Stage {
+        private Texture textureFondo;
+        public  EscenaPausa(Viewport vista){
+            super(vista);//pasa la vista al constructor stage
+            textureFondo=new Texture("runner/btones.png");
+            Image imgeFondo=new Image(textureFondo);
+            imgeFondo.setPosition(ANCHO/2,ALTO/2, Align.center);
+            addActor(imgeFondo);
+            //Boton continuar
+            Texture textureBtn=new Texture("runner/btnContinuar.png");
+            TextureRegionDrawable trd = new TextureRegionDrawable(textureBtn);
+            Button btn = new Button(trd);
+            addActor(btn);
+            btn.setPosition(ANCHO/2,ALTO/2,Align.center);
+            btn.addListener(new ClickListener(){
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    //QUITAR Pausa
+                    estadoJuego=EstadoJuego.JUGANDO;
+                    Gdx.input.setInputProcessor(procesadorEntrada);
+                }
+            });
+        }
+
+    }
+
+    private enum  EstadoJuego {
+        JUGANDO,
+        PAUSADO
     }
 }

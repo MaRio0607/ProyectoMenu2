@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -15,6 +16,7 @@ public class PantallaPlataformas extends Pantalla {
     //Mapa
     private TiledMap mapa;
     private OrthogonalTiledMapRenderer rendererMapa;
+    private ParticleEffect pe;
 
     public PantallaPlataformas(Juego juego) {
     }
@@ -29,15 +31,26 @@ public class PantallaPlataformas extends Pantalla {
         rendererMapa =new OrthogonalTiledMapRenderer(mapa);
         //poner input procesor
         Gdx.input.setInputProcessor(new ProcesadorInput());
+        //paticula
+        pe= new ParticleEffect();
+        pe.load(Gdx.files.internal("lluvia.pe"),Gdx.files.internal(""));
+        pe.getEmitters().get(0).setPosition(0,ALTO);
+        pe.start();
     }
 
     @Override
     public void render(float delta) {
+        pe.update(delta);
+
         borrarPantalla();
+
         batch.setProjectionMatrix(camara.combined);
 
         rendererMapa.setView(camara);
         rendererMapa.render();
+        batch.begin();
+        pe.draw(batch);
+        batch.end();
 
     }
 
